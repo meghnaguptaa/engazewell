@@ -1,17 +1,40 @@
 package com.project.runner;
 
-import org.junit.runner.RunWith;
+    import java.io.File;
 
-import io.cucumber.junit.Cucumber;
-import io.cucumber.junit.CucumberOptions;
+    import org.testng.annotations.Listeners;
+    import org.testng.annotations.Test;
 
-@RunWith(Cucumber.class)
-@CucumberOptions(features="src/test/resources/com/project/features",
-				 glue={"com/project/stepdefinitions","com/project/hook"},
-				 publish=true,
-				 plugin={"pretty","html:target/CucumberReports/CucumberReport.html"})
-public class TestRunner {
-	
-	
+    import com.aventstack.extentreports.testng.listener.ExtentITestListenerClassAdapter;
 
-}
+    import io.cucumber.testng.AbstractTestNGCucumberTests;
+
+    @Listeners({ExtentITestListenerClassAdapter.class})
+    public class TestRunner extends AbstractTestNGCucumberTests {
+        
+        @Test(priority = 0)
+        public void runUploadnewcandidateprofile() {
+            runCucumberFeature("src/test/resources/com/engazewell/features/UploadNewCandidateProfile.feature");
+        }
+    \n    @Test(priority = 1)
+        public void runUploadnewcandidateprofilePo() {
+            runCucumberFeature("src/test/resources/com/engazewell/features/UploadNewCandidateProfile_po.feature");
+        }
+    
+            
+    private void runCucumberFeature(String featurePath) {
+            String featureName = new File(featurePath).getName().replace(".feature", "");
+
+            String[] argv = new String[] {
+                featurePath,
+                "--plugin", "pretty",
+                "--plugin", "html:target/cucumber-reports/html-" + featureName + ".html",
+                "--plugin", "json:target/cucumber-reports/" + featureName + ".json",
+                "--plugin", "junit:target/cucumber-reports/" + featureName + ".xml",
+                "--glue", "com.project.runner.stepdefinitions"
+            };
+
+            io.cucumber.core.cli.Main.run(argv, Thread.currentThread().getContextClassLoader());
+        }
+    }
+    
